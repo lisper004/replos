@@ -1,0 +1,13 @@
+(use-modules (ice-9 ftw))
+
+(define %auto-compilation-options (cons '#:never %auto-compilation-options))
+
+(define (todir)
+  (chdir (string-append (getenv "HOME") "/.replos/"))
+  (format #t "BOOTED IN: ~a\n" (getcwd)))
+
+(todir)
+
+(load (string-append (getenv "HOME") "/.replos/core/boot/init.scm"))
+
+(define %auto-compilation-options (cdr %auto-compilation-options))
