@@ -6,7 +6,7 @@
 ;; 1. BASE VARIABLES
 ;; ============================================================
 
-(define *replos-version* "0.7")
+(define *replos-version* "0.6")
 (define *replos-home* (string-append (getenv "HOME") "/.replos/"))
 (define *replos-lib* (string-append *replos-home* "core/lib/"))
 (define *replos-state* (string-append *replos-home* "state.scm"))
