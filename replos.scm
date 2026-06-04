@@ -180,7 +180,7 @@
   (let ((answer (read-line)))
     (when (or (string=? answer "y") (string=? answer "yes"))
       (format #t ">> Uh, Fine. But you'll be back.\n")
-      (save-state)
+      (save-world)
       (exit))))
 
 (define (clear)
