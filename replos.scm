@@ -46,11 +46,11 @@
 ;; 3. LOADING AND SAVING STATE
 ;; ============================================================
 
-(define (save-state)
+(define (save-world)
   (call-with-output-file *replos-state*
     (lambda (port)
       (write `(set! *loaded-packages* ',*loaded-packages*) port)))
-  (format #t "[REPLOS] State saved.\n"))
+  (format #t "[REPLOS] World (state) saved.\n"))
 
 (define (load-state)
   (if (file-exists? *replos-state*)
@@ -186,8 +186,6 @@
 (define (clear)
   (system "clear"))
 
-(define (save)
-  (save-state))
 
 ;; ============================================================
 ;; 8. START
