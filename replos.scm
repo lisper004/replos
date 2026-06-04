@@ -166,11 +166,11 @@
 |                                                                |
 |                                                                |
 | SYSTEM                                                         |
-|   (save)            - save session state                       |
+|   (save-world)      - save session state                       |
 |   (help)            - this message                             |
 |   (quit)            - exit REPLOS                              |
 |                                                                |
-| You can also write any Scheme expression!                      |
+| You can also write any Scheme/LisperLisp expression!           |
 +-----------------------------------------------------------------+
 "))
   (format #t "REPLOS version ~a\n" *replos-version*)
