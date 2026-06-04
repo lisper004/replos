@@ -49,6 +49,8 @@ Optional:
 
 * Emacs (for (ed) - can be replaced with any editor)
 
+* Curl or Wget (for (package-install) - can be replaced)
+
 # License
 
 GPLv3 — free software, as Richard Stallman intended.
