@@ -1,5 +1,7 @@
 ;; Init REPLOS
 
+(use-modules (ice-9 ftw)) 
+
 ;; BASE DIRECTORY
 (define *replos-root* (string-append (getenv "HOME") "/.replos/"))
 (define *replos-core* (string-append *replos-root* "core/"))

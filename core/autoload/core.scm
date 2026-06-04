@@ -2,6 +2,8 @@
              (ice-9 rdelim)
              (ice-9 ftw))
 
+(define *replos-start-time* (current-time))
+
 (define (ls . dir)
   (let ((target (if (null? dir) "." (car dir))))
     (if (file-exists? target)
@@ -86,3 +88,17 @@
   (format #t "Back in REPL. Reload? (y/n): ")
   (when (string=? (read-line) "y")
     (load file)))
+
+(define (uptime)
+  (let* ((now (current-time))
+         (diff (- now *replos-start-time*))
+         (hours (quotient diff 3600))
+         (mins (quotient (remainder diff 3600) 60))
+         (secs (remainder diff 60)))
+    (format #t "REPLOS session uptime: ")
+    (when (> hours 0) (format #t "~d hour~p " hours hours))
+    (when (> mins 0) (format #t "~d minute~p " mins mins))
+    (format #t "~d second~p\n" secs secs)
+    (if (< diff 60)
+        (display ">> Fresh session! Welcome.\n")
+        (display ">> Still going strong!\n"))))

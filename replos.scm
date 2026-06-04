@@ -6,7 +6,7 @@
 ;; 1. BASE VARIABLES
 ;; ============================================================
 
-(define *replos-version* "0.6")
+(define *replos-version* "0.7")
 (define *replos-home* (string-append (getenv "HOME") "/.replos/"))
 (define *replos-lib* (string-append *replos-home* "core/lib/"))
 (define *replos-state* (string-append *replos-home* "state.scm"))
@@ -88,64 +88,62 @@
               (format #t "[REPLOS] Loaded ~a packages.\n" (length *loaded-packages*)))))
       (format #t "[REPLOS] No packages directory.\n")))
 
-;; ============================================================
-;; 5. PACKAGE MANAGEMENT
-;; ============================================================
+;; NOT IN USE YET
 
-(define (package-install)
-  (ensure-directories)
-  (display "Package name: ")
-  (let ((pkg (string-trim-both (read-line))))
-    (if (string-null? pkg)
-        (format #t "Aborted.\n")
-        (let ((target-file (string-append *replos-lib* pkg ".lisp")))
-          (if (file-exists? target-file)
-              (format #t "Package ~a already installed.\n" pkg)
-              (begin
-                (format #t "Creating template for ~a.lisp...\n" pkg)
-                (call-with-output-file target-file
-                  (lambda (port)
-                    (format port ";; Package: ~a\n" pkg)
-                    (format port "(define (~a)\n" pkg)
-                    (format port "  (display \"Hello from ~a!\\n\"))\n" pkg)))
-                (load-lisp-file target-file)
-                (set! *loaded-packages* (cons (string-append pkg ".lisp") *loaded-packages*))
-                (format #t "[REPLOS] Package ~a created.\n" pkg)
-                (format #t "  Usage: (~a)\n" pkg)
-                (format #t "  Edit:  (edit '~a)\n" pkg)))))))
+;; (define (package-install)
+;;   (ensure-directories)
+;;   (display "Package name: ")
+;;   (let ((pkg (string-trim-both (read-line))))
+;;     (if (string-null? pkg)
+;;         (format #t "Aborted.\n")
+;;         (let ((target-file (string-append *replos-lib* pkg ".lisp")))
+;;           (if (file-exists? target-file)
+;;               (format #t "Package ~a already installed.\n" pkg)
+;;               (begin
+;;                 (format #t "Creating template for ~a.lisp...\n" pkg)
+;;                 (call-with-output-file target-file
+;;                   (lambda (port)
+;;                     (format port ";; Package: ~a\n" pkg)
+;;                     (format port "(define (~a)\n" pkg)
+;;                     (format port "  (display \"Hello from ~a!\\n\"))\n" pkg)))
+;;                 (load-lisp-file target-file)
+;;                 (set! *loaded-packages* (cons (string-append pkg ".lisp") *loaded-packages*))
+;;                 (format #t "[REPLOS] Package ~a created.\n" pkg)
+;;                 (format #t "  Usage: (~a)\n" pkg)
+;;                 (format #t "  Edit:  (edit '~a)\n" pkg)))))))
 
-(define (package-remove pkg)
-  (let ((file (string-append *replos-lib* pkg ".lisp")))
-    (if (file-exists? file)
-        (begin
-          (delete-file file)
-          (set! *loaded-packages* (delete (string-append pkg ".lisp") *loaded-packages*))
-          (format #t "[REPLOS] Package ~a removed.\n" pkg))
-        (format #t "Package ~a not found.\n" pkg))))
+;; (define (package-remove pkg)
+;;   (let ((file (string-append *replos-lib* pkg ".lisp")))
+;;     (if (file-exists? file)
+;;         (begin
+;;           (delete-file file)
+;;           (set! *loaded-packages* (delete (string-append pkg ".lisp") *loaded-packages*))
+;;           (format #t "[REPLOS] Package ~a removed.\n" pkg))
+;;         (format #t "Package ~a not found.\n" pkg))))
 
-(define (packages)
-  (if (null? *loaded-packages*)
-      (format #t "No packages installed.\n")
-      (begin
-        (format #t "Installed packages (~a):\n" (length *loaded-packages*))
-        (for-each (lambda (pkg) (format #t "  ~a\n" pkg))
-                  (sort *loaded-packages* string<?)))))
+;; (define (packages)
+;;   (if (null? *loaded-packages*)
+;;       (format #t "No packages installed.\n")
+;;       (begin
+;;         (format #t "Installed packages (~a):\n" (length *loaded-packages*))
+;;         (for-each (lambda (pkg) (format #t "  ~a\n" pkg))
+;;                   (sort *loaded-packages* string<?)))))
 
-(define (edit pkg)
-  (let ((file (string-append *replos-lib* pkg ".lisp")))
-    (if (file-exists? file)
-        (let ((editor (or (getenv "EDITOR") "nano")))
-          (system (string-append editor " " file))
-          (format #t "Reload ~a? (y/n): " pkg)
-          (let ((answer (read-line)))
-            (when (or (string=? answer "y") (string=? answer "yes"))
-              (load-lisp-file file)
-              (format #t "[REPLOS] ~a reloaded.\n" pkg))))
-        (format #t "Package ~a not found. Install it first.\n" pkg))))
+;; (define (edit pkg)
+;;   (let ((file (string-append *replos-lib* pkg ".lisp")))
+;;     (if (file-exists? file)
+;;         (let ((editor (or (getenv "EDITOR") "nano")))
+;;           (system (string-append editor " " file))
+;;           (format #t "Reload ~a? (y/n): " pkg)
+;;           (let ((answer (read-line)))
+;;             (when (or (string=? answer "y") (string=? answer "yes"))
+;;               (load-lisp-file file)
+;;               (format #t "[REPLOS] ~a reloaded.\n" pkg))))
+;;         (format #t "Package ~a not found. Install it first.\n" pkg))))
 
-(define (reload)
-  (format #t "Reloading all packages...\n")
-  (load-all-packages))
+;; (define (reload)
+;;   (format #t "Reloading all packages...\n")
+;;   (load-all-packages))
 
 ;; ============================================================
 ;; 7. SYSTEM FUNCTIONS
@@ -157,7 +155,7 @@
 |                         REPLOS HELP                            |
 +-----------------------------------------------------------------+
 | FILESYSTEM                                                     |
-|   (ls [dir])        - list directory                           |
+|   (ls \"dir\")        - list directory                         |
 |   (cd \"dir\")       - change directory                        |
 |   (whereami)             - print working directory             |
 |   (make-dir \"dir\")    - create directory                     |
@@ -166,11 +164,6 @@
 |   (touch \"file\")   - create/update file                      |
 |   (rm \"file\")      - delete file                             |
 |                                                                |
-| PACKAGES                                                       |
-|   (package-install)         - create new package               |
-|   (package-remove)     - remove package                        |
-|   (packages)        - list installed packages                  |
-|   (reload)          - reload all packages                      |
 |                                                                |
 | SYSTEM                                                         |
 |   (save)            - save session state                       |
@@ -183,9 +176,12 @@
   (format #t "REPLOS version ~a\n" *replos-version*)
 
 (define (quit)
-  (save-state)
-  (format #t "Goodbye from REPLOS!\n")
-  (exit))
+  (format #t ">> Are u sure? (y/n): ")
+  (let ((answer (read-line)))
+    (when (or (string=? answer "y") (string=? answer "yes"))
+      (format #t ">> Uh, Fine. But you'll be back.\n")
+      (save-state)
+      (exit))))
 
 (define (clear)
   (system "clear"))
