@@ -32,7 +32,7 @@ guile
 │   │   └── init.scm        # Loader
 │   ├── autoload/           # Automatically loaded modules
 │   │   ├── core.scm        # Base commands
-│   │   ├── packages.scm    # Package management
+│   │   ├── pkg.scm         # Package manager
 │   │   └── *.scm           # Your modules
 │   ├── bin/                # Compiled files (.go)
 │   └── lib/                # Package sources (.lisp)
