@@ -1,3 +1,6 @@
+;; so... it doesn't work perfectly yet, or rather it doesn't work at all (but it compiles), so if you understand this, try to correct my mistakes and errors.
+
+
 (use-modules (fibers)
              (fibers channels)
              (ice-9 match)
