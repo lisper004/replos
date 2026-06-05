@@ -18,7 +18,7 @@ REPLOS is more than just a set of commands. It's an attempt to restore the parad
 
 ```bash
 git clone https://github.com/lisper004/replos.git ~/.replos && cd ~/.replos
-mv guile .guile && cp guile ~/
+cp guile ~/
 guile
 ```
 **Done!~**
