@@ -9,40 +9,40 @@
     (if (file-exists? target)
         (let ((files (scandir-nodots target)))
           (if (null? files)
-              (format #t "Directory ~a is empty.\n" target)
+              (format #t ">> Directory ~a is empty.\n" target)
               (begin
-                (format #t "Contents of ~a:\n" target)
+                (format #t ">> Contents of ~a:\n" target)
                 (for-each (lambda (f) 
                             (let ((full (string-append target "/" f)))
                               (format #t "  ~a~a\n" 
                                       f (if (file-is-directory? full) "/" ""))))
                           files))))
-        (format #t "Directory ~a not found.\n" target))))
+        (format #t ">> Directory ~a not found.\n" target))))
 
 (define (cd dir)
   (if (file-exists? dir)
       (begin
         (chdir dir)
-        (format #t "Now in: ~a\n" (getcwd)))
-      (format #t "Directory ~a not found.\n" dir)))
+        (format #t ">> Now in: ~a\n" (getcwd)))
+      (format #t ">> Directory ~a not found.\n" dir)))
 
 (define (whereami)
   (format #t "~a\n" (getcwd)))
 
 (define (make-dir dir)
   (if (file-exists? dir)
-      (format #t "Directory ~a already exists.\n" dir)
+      (format #t ">> Directory ~a already exists.\n" dir)
       (begin
         (mkdir dir)
-        (format #t "Created: ~a\n" dir))))
+        (format #t ">> Created: ~a\n" dir))))
 
 (define (remove-dir dir)
   (catch #t
     (lambda () 
       (rmdir dir)
-      (format #t "Removed: ~a\n" dir))
+      (format #t ">> Removed: ~a\n" dir))
     (lambda (key . args)
-      (format #t "Cannot remove ~a\n" dir))))
+      (format #t ">> Cannot remove ~a\n" dir))))
 
 (define (remove-dir-recursive dir)
   (define (delete-all files)
@@ -56,7 +56,7 @@
   (let ((files (list-dir dir)))
     (delete-all files)
     (rmdir dir))
-  (format #t "Removed: ~a\n" dir))
+  (format #t ">> Removed: ~a\n" dir))
 
 (define (cat file)
   (if (file-exists? file)
@@ -70,22 +70,22 @@
                     (display line)
                     (newline)
                     (loop)))))))
-      (format #t "File ~a not found.\n" file)))
+      (format #t ">> File ~a not found.\n" file)))
 
 (define (touch file)
   (call-with-output-file file (lambda (port) #t))
-  (format #t "Touched: ~a\n" file))
+  (format #t ">> Touched: ~a\n" file))
 
 (define (rm file)
   (if (file-exists? file)
       (begin
         (delete-file file)
-        (format #t "Deleted: ~a\n" file))
-      (format #t "File ~a not found.\n" file)))
+        (format #t ">> Deleted: ~a\n" file))
+      (format #t ">> File ~a not found.\n" file)))
 
 (define (ed file)
   (system (string-append "emacs -nw " file)) ;; Make sure you have emacs installed.
-  (format #t "Back in REPL. Reload? (y/n): ")
+  (format #t ">> Back in REPL. Reload? (y/n): ")
   (when (string=? (read-line) "y")
     (load file)))
 
@@ -95,7 +95,7 @@
          (hours (quotient diff 3600))
          (mins (quotient (remainder diff 3600) 60))
          (secs (remainder diff 60)))
-    (format #t "REPLOS session uptime: ")
+    (format #t ">> REPLOS session uptime: ")
     (when (> hours 0) (format #t "~d hour~p " hours hours))
     (when (> mins 0) (format #t "~d minute~p " mins mins))
     (format #t "~d second~p\n" secs secs)
