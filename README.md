@@ -18,7 +18,7 @@ REPLOS is more than just a set of commands. It's an attempt to restore the parad
 
 ```bash
 git clone https://github.com/lisper004/replos.git ~/.replos && cd ~/.replos
-cp .guile ~/
+mv guile .guile && cp guile ~/
 guile
 ```
 **Done!~**
@@ -50,6 +50,8 @@ Optional:
 * Emacs (for (ed) - can be replaced with any editor)
 
 * Curl or Wget (for (package-install) - can be replaced)
+
+* guile-colorized for .guile config file (you can comment out the line)
 
 # License
 
