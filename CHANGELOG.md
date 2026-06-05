@@ -10,3 +10,6 @@ v0.7.1 - 2026-06-04
 v0.8 - 2026-06-04
 - Added pipes for Lisper Lisp (use: (pp (command) (command)) )
 - Added (async) for background jobs (example: (async (firefox)) (jobs) )
+
+v0.8.1 - 2026-06-05
+- Added guile-colorized to .guile config, so u can see a colored REPL yo!
