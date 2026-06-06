@@ -1,6 +1,7 @@
 (use-modules (ice-9 ftw)
 	     (ice-9 readline)
-             (ice-9 colorized))
+             (ice-9 colorized)
+	     (system repl common))	
 
 ;; (define %auto-compilation-options (cons '#:never %auto-compilation-options))
 
@@ -10,11 +11,31 @@
 
 (todir)
 
-;;(load (string-append (getenv "HOME") "/.replos/core/boot/init.scm"))
-(primitive-load (string-append (getenv "HOME") "/.replos/core/boot/init.scm"))
+(load (string-append (getenv "HOME") "/.replos/core/boot/init.scm"))
+;;(primitive-load (string-append (getenv "HOME") "/.replos/core/boot/init.scm"))
 
 (activate-readline)
 
 (activate-colorized)
+
+;;----------------------------------------
+;; LISP-MACHINE STYLE PROMPT
+;;----------------------------------------
+
+;; (define make-counter
+;;   (let ((count 0))
+;;     (lambda ()
+;;       (set! count (+ count 1))
+;;       count)))
+
+;; (define (lispy-prompt repl)
+;;   (let* ((module (module-name (current-module)))
+;;          (module-str (if (null? module)
+;;                          "USER"
+;;                          (string-upcase (string-join (map symbol->string module) "-"))))
+;;          (counter (make-counter)))
+;;     (format #f "~a ~a > " module-str counter)))
+
+;;(repl-default-option-set! 'prompt lispy-prompt)
 
 ;; (define %auto-compilation-options (cdr %auto-compilation-options))
