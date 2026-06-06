@@ -102,3 +102,28 @@
     (if (< diff 60)
         (display ">> Fresh session! Welcome.\n")
         (display ">> Still going strong!\n"))))
+
+(define (update-via-git)
+  (let ((replos-dir (string-append (getenv "HOME") "/.replos")))
+    (if (file-exists? (string-append replos-dir "/.git"))
+        (begin
+          (let ((git-check (system "which git > /dev/null 2>&1")))
+            (if (not (zero? git-check))
+                (display ">> Git is not installed. Please install git first.\n")
+                (begin
+                  (chdir replos-dir)
+                  (display ">> Updating REPLOS from GitHub...\n")
+                  (let ((status (system "git pull --rebase")))
+                    (if (zero? status)
+                        (begin
+                          (display ">> Update successful.\n")
+                          (display ">> Reload REPLOS? (y/n): ")
+                          (when (string=? (read-line) "y")
+                            (load (string-append replos-dir "/core/boot/init.scm"))
+                            (display ">> REPLOS reloaded.\n")))
+                        (begin
+                          (display ">> Update failed. Check network or resolve conflicts.\n")
+                          (display ">> Try: (cd ~/.replos) and (git status)\n"))))))))
+        (display ">> REPLOS was not installed via git.\n")
+        (display ">> To enable updates, reinstall with:\n")
+        (display ">> git clone https://github.com/lisper004/replos.git ~/.replos\n"))))
