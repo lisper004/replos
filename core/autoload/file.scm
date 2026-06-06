@@ -9,7 +9,7 @@
   (newline))
 
 (define (cmd arg)
-  (system (string-append arg)))
+  (system arg))
 
 (define (git-status)
   (cmd "git status"))
@@ -25,3 +25,8 @@
 
 (define (git-push)
   (cmd "git push"))
+
+(define (git-update-all aboutcommit)
+  (git-add-all)
+  (git-commit-m aboutcommit)
+  (git-push))
