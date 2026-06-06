@@ -124,6 +124,7 @@
                         (begin
                           (display ">> Update failed. Check network or resolve conflicts.\n")
                           (display ">> Try: (cd ~/.replos) and (git status)\n"))))))))
-        (display ">> REPLOS was not installed via git.\n")
-        (display ">> To enable updates, reinstall with:\n")
-        (display ">> git clone https://github.com/lisper004/replos.git ~/.replos\n"))))
+        (begin
+          (display ">> REPLOS was not installed via git.\n")
+          (display ">> To enable updates, reinstall with:\n")
+          (display ">> git clone https://github.com/lisper004/replos.git ~/.replos\n")))))
