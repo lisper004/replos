@@ -53,6 +53,8 @@ Optional:
 
 * guile-colorized for .guile config file (you can comment out the line)
 
+* fibers for core/autoload/test-pipeline.scm (u can delete file from autoload)
+ 
 # License
 
 GPLv3 — free software, as Richard Stallman intended.
