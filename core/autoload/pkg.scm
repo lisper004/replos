@@ -87,8 +87,3 @@
               (format #t ">> Package ~a not found.\n" pkg-name))))))
 
 (ensure-autoload-dir)
-
-(display "\n Package Manager loaded.\n")
-(display "  (package-install) - install new package\n")
-(display "  (package-list)    - list installed packages\n")
-(display "  (package-remove)  - remove package\n")
