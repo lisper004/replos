@@ -11,6 +11,9 @@
 (define (cmd arg)
   (system arg))
 
+(define (runsc scmfile)
+  (system (string-append "guile " scmfile)))
+
 (define (git-status)
   (cmd "git status"))
 
