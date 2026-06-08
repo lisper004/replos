@@ -1,0 +1,264 @@
+(use-modules (ice-9 match)
+             (ice-9 receive)
+             (srfi srfi-1)
+             (srfi srfi-11))
+
+(define-syntax defun
+  (lambda (x)
+    (syntax-case x ()
+      ((_ name (arg ...) body ...)
+       #'(define (name arg ...)
+           (begin body ...))))))
+
+(define-syntax defun*
+  (lambda (x)
+    (syntax-case x ()
+      ((_ name (arg ...) docstring body ...)
+       (string? (syntax->datum #'docstring))
+       #'(define (name arg ...)
+           docstring
+           (begin body ...)))
+      ((_ name (arg ...) body ...)
+       #'(defun name (arg ...) body ...)))))
+
+(define-syntax defmacro
+  (lambda (x)
+    (define (make-gensym)
+      (datum->syntax #'here (gensym "macro")))
+    (syntax-case x ()
+      ((_ name (args ...) body ...)
+       (with-syntax ((tmp (make-gensym)))
+         #'(define-syntax name
+             (lambda (tmp)
+               (syntax-case tmp ()
+                 ((_ . args)
+                  (let ((%args (syntax->datum #'(args ...))))
+                    #`(let #,(map list %args (syntax->datum #'(args ...)))
+                        body ...)))))))))))
+
+(define-syntax prog1
+  (lambda (x)
+    (syntax-case x ()
+      ((_ first rest ...)
+       #'(let ((result first))
+           (begin rest ...)
+           result))
+      ((_ expr) #'expr))))
+
+(define-syntax prog2
+  (lambda (x)
+    (syntax-case x ()
+      ((_ first second rest ...)
+       #'(let ((tmp first))
+           (begin tmp (prog1 second rest ...)))))))
+
+(define-syntax progn1 (syntax-rules () ((_ . args) (prog1 . args))))
+(define-syntax prog1* (syntax-rules () ((_ . args) (prog1 . args))))
+
+(define-syntax when
+  (lambda (x)
+    (syntax-case x ()
+      ((_ test body ...)
+       #'(if test
+             (begin body ...)
+             #f)))))
+
+(define-syntax unless
+  (lambda (x)
+    (syntax-case x ()
+      ((_ test body ...)
+       #'(if (not test)
+             (begin body ...)
+             #f)))))
+
+(define-syntax if-not
+  (lambda (x)
+    (syntax-case x ()
+      ((_ test then else)
+       #'(if (not test) then else)))))
+
+(define-syntax setf
+  (lambda (x)
+    (define (expand-setf place value)
+      (syntax-case place ()
+        ((car obj) #'(set-car! obj value))
+        ((cdr obj) #'(set-cdr! obj value))
+        ((first obj) #'(set-car! obj value))
+        ((rest obj) #'(set-cdr! obj value))
+        ((elt obj idx) #'(vector-set! obj idx value))
+        ((aref obj idx) #'(vector-set! obj idx value))
+        ((svref obj idx) #'(vector-set! obj idx value))
+        ((symbol-value sym) #'(set! sym value))
+        (else #'(set! place value))))
+    
+    (syntax-case x ()
+      ((_ place value)
+       (expand-setf #'place #'value))
+      ((_ place1 value1 place2 value2 ...)
+       #'(progn (setf place1 value1)
+                (setf place2 value2 ...))))))
+
+(define-syntax incf
+  (lambda (x)
+    (syntax-case x ()
+      ((_ place) #'(setf place (+ place 1)))
+      ((_ place delta) #'(setf place (+ place delta))))))
+
+(define-syntax decf
+  (lambda (x)
+    (syntax-case x ()
+      ((_ place) #'(setf place (- place 1)))
+      ((_ place delta) #'(setf place (- place delta))))))
+
+(define-syntax push
+  (lambda (x)
+    (syntax-case x ()
+      ((_ item place)
+       #'(setf place (cons item place))))))
+
+(define-syntax pop
+  (lambda (x)
+    (syntax-case x ()
+      ((_ place)
+       #'(let ((val (car place)))
+           (setf place (cdr place))
+           val)))))
+
+(define-syntax cond
+  (lambda (x)
+    (syntax-case x ()
+      ((_ (test . body) ...)
+       #'(if test
+             (begin body ...)
+             (cond ...)))
+      ((_ (else . body) ...)
+       #'(begin body ...))
+      ((_)
+       #f))))
+
+(define-syntax case
+  (lambda (x)
+    (syntax-case x (else)
+      ((_ key ((k ...) expr ...) ... (else else-expr ...))
+       #'(let ((kval key))
+           (cond ,@(map (lambda (clause)
+                          (syntax-case clause (else)
+                            ((klist body ...)
+                             #`((or ,@(map (lambda (k)
+                                             #`(eqv? kval #,k))
+                                           (syntax->datum #'klist)))
+                                (begin body ...)))
+                            (_ #'#f)))
+                        #'((k ...) expr ...))
+                 (else (begin else-expr ...)))))
+      ((_ key clause ...)
+       #'(case key clause ... (else #f))))))
+
+;; (define-syntax loop
+;;   (lambda (x)
+;;     (syntax-case x (for in from to upto downto collect sum)
+;;       ((_ (for var from start to end) collect expr)
+;;        #'(let loop ((var start))
+;;            (if (<= var end)
+;;                (cons expr (loop (1+ var)))
+;;                '())))
+;;       ((_ (for var from start upto end) collect expr)
+;;        #'(loop (for var from start to end) collect expr))
+;;       ((_ (for var from start downto end) collect expr)
+;;        #'(let loop ((var start))
+;;            (if (>= var end)
+;;                (cons expr (loop (1- var)))
+;;                '())))
+;;       ((_ (for var in lst) collect expr)
+;;        #'(map (lambda (var) expr) lst))
+;;       ((_ (for var from start to end) sum expr)
+;;        #'(let loop ((var start) (acc 0))
+;;            (if (<= var end)
+;;                (loop (1+ var) (+ acc expr))
+;;                acc)))
+;;       ((_ (repeat n) body ...)
+;;        #'(let loop ((i 0))
+;;            (if (< i n)
+;;                (begin body ... (loop (1+ i))))))
+;;       ((_ body ...)
+;;        #'(let loop ()
+;;            body ...
+;;            (loop))))))
+
+(define-syntax block
+  (lambda (x)
+    (syntax-case x ()
+      ((_ name . body)
+       #'(call-with-current-continuation
+          (lambda (return-from-name)
+            (dynamic-wind
+              (lambda () #t)
+              (lambda () . body)
+              (lambda () #t))))))))
+
+(define-syntax return-from
+  (lambda (x)
+    (syntax-case x ()
+      ((_ name value)
+       #'(name value))
+      ((_ name)
+       #'(name #f)))))
+
+(define-syntax return
+  (lambda (x)
+    (syntax-case x ()
+      ((_ value)
+       #'(return-from return-from-block value))
+      ((_)
+       #'(return-from return-from-block #f)))))
+
+(define-syntax flet
+  (lambda (x)
+    (syntax-case x ()
+      ((_ ((name args body ...) ...) . body2)
+       #'(letrec-syntax
+           ((name (syntax-rules ()
+                    ((_ . args) body ...)))
+            ...)
+           . body2)))))
+
+(define-syntax labels
+  (lambda (x)
+    (syntax-case x ()
+      ((_ ((name args body ...) ...) . body2)
+       #'(letrec ((name (lambda args body ...)) ...)
+           . body2)))))
+
+(define-syntax multiple-value-bind
+  (lambda (x)
+    (syntax-case x ()
+      ((_ (var ...) expr . body)
+       #'(receive (var ...) expr
+           . body)))))
+
+(define-syntax with-open-file
+  (lambda (x)
+    (syntax-case x ()
+      ((_ (stream filename direction . options) . body)
+       #'(call-with-input-file filename
+           (lambda (stream)
+             . body))))))
+
+(define (zerop x) (zero? x))
+(define (nullp x) (null? x))
+(define (listp x) (list? x))
+(define (atom x) (not (pair? x)))
+(define (consp x) (pair? x))
+(define (oddp x) (odd? x))
+(define (evenp x) (even? x))
+
+(define first car)
+(define second cadr)
+(define third caddr)
+(define fourth cadddr)
+(define fifth (lambda (x) (car (cddddr x))))
+
+(define rest cdr)
+(define (butlast lst) (drop-right lst 1))
+(define (nthcdr n lst) (drop lst n))
+(define (last lst) (list (car (take-right lst 1))))

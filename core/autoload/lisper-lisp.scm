@@ -163,24 +163,25 @@
       (error ">> pp: expected procedure, got" proc)))
 
 ;; ============================================================
+;; PROGN
+;; ============================================================
+(define-syntax progn
+  (syntax-rules ()
+    ((progn) #t)
+    ((progn expr) expr)
+    ((progn expr1 expr2 ...)
+     (begin expr1 expr2 ...))))
+
+;; ============================================================
 ;; 13. Welcome message
 ;; ============================================================
 
 (display "
 ╔═══════════════════════════════════════════╗
-║     LisperLisp v0.2 loaded!               ║
+║     LisperLisp v0.3 loaded!               ║
 ║                                           ║
 ║  Commands:                                ║
-║    (defic ((name) body...))               ║
-║    (defunc name (args) body...)           ║
-║    (prinf fmt args...)                    ║
-║    (prin expr...)                         ║
-║    (setv var value) (chav var value)      ║
-║    (loop n body...)                       ║
-║    (loop-with (i n) body...)              ║
-║    (loop-over var in list body...)        ║
-║    (while test body...)                   ║
-║    (pp (command) (command))               ║
-║    (wait seconds)                         ║
+║  Check core/autoload/lisper-lisp.scm      ║
+║                                           ║
 ╚═══════════════════════════════════════════╝
 ")

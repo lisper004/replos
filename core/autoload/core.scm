@@ -128,3 +128,9 @@
           (display ">> REPLOS was not installed via git.\n")
           (display ">> To enable updates, reinstall with:\n")
           (display ">> git clone https://github.com/lisper004/replos.git ~/.replos\n")))))
+
+(define (echo text file)
+  (let ((port (open-file file "a")))
+    (display text port)
+    (newline port)
+    (close-port port)))
